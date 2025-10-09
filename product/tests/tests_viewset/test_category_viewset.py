@@ -33,8 +33,6 @@ class CategoryViewSet(APITestCase):
             content_type="application/json",
         )
 
-        import pdb; pdb.set_trace()
-
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         created_category = Category.objects.get(title="technology")
