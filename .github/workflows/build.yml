@@ -11,36 +11,48 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    services:
+      db:
+        image: postgres:16-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: bookstore_dev
+          POSTGRES_PASSWORD: bookstore_dev
+          POSTGRES_DB: bookstore_dev_db
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
 
       - name: Install Poetry
         run: |
           python -m ensurepip
           python -m pip install --upgrade pip
-          python -m pip install --upgrade poetry
-
-      - name: Cache Poetry dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/pypoetry
-            ~/.cache/pip
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-poetry-
+          pip install --upgrade poetry
 
       - name: Install dependencies
-        shell: bash
-        run: poetry install --no-interaction --no-ansi
+        run: poetry install --no-root
 
-      - name: Run tests
+      - name: Build and start Docker Compose
+        run: docker-compose up -d --build
+
+      - name: Run Django tests inside container
         env:
-          DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1"  # variável definida para evitar erro
-        run: poetry run python manage.py test
+          DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1"
+          SECRET_KEY: "fake-secret-key-for-ci"
+          DATABASE_URL: "postgres://bookstore_dev:bookstore_dev@db:5432/bookstore_dev_db"
+        run: docker-compose exec -T web poetry run python manage.py test
+
+      - name: Shutdown Docker Compose
+        run: docker-compose down
