@@ -12,21 +12,21 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
+      # Adding a PostgreSQL service
       db:
         image: postgres:16-alpine
         ports:
-          - 5432:5432
+          - 5434:5432
         env:
           POSTGRES_USER: bookstore_dev
           POSTGRES_PASSWORD: bookstore_dev
           POSTGRES_DB: bookstore_dev_db
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v2
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -35,24 +35,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
-      - name: Install Poetry
+      - name: Install poetry
         run: |
           python -m ensurepip
           python -m pip install --upgrade pip
-          pip install --upgrade poetry
+          python -m pip install --upgrade poetry
 
       - name: Install dependencies
-        run: poetry install --no-root
+        shell: bash
+        run: poetry install
 
-      - name: Build and start Docker Compose
+      # Start Docker Compose and run tests within the container
+      - name: Start Docker Compose services
         run: docker-compose up -d --build
 
-      - name: Run Django tests inside container
-        env:
-          DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1"
-          SECRET_KEY: "fake-secret-key-for-ci"
-          DATABASE_URL: "postgres://bookstore_dev:bookstore_dev@db:5432/bookstore_dev_db"
-        run: docker-compose exec -T web poetry run python manage.py test
-
-      - name: Shutdown Docker Compose
-        run: docker-compose down
+      - name: Run Tests
+        run: docker-compose exec -T web python manage.py test
