@@ -7,32 +7,40 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.11, 3.12]
+        python-version: [3.12]
 
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3  # atualizado
+      - uses: actions/checkout@v3
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4  # atualizado
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'  # acelera instalações
+          cache: 'pip'
 
-      - name: Install poetry
+      - name: Install Poetry
         run: |
           python -m ensurepip
           python -m pip install --upgrade pip
           python -m pip install --upgrade poetry
 
-      - name: View poetry --help
-        run: poetry --help
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
 
       - name: Install dependencies
         shell: bash
-        run: python -m poetry install
+        run: poetry install --no-interaction --no-ansi
 
-      - name: Test
-        run: |
-          poetry run python manage.py test
+      - name: Run tests
+        env:
+          DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1"  # variável definida para evitar erro
+        run: poetry run python manage.py test
