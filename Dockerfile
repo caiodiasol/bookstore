@@ -30,24 +30,25 @@ ENV PYTHONUNBUFFERED=1 \
     PYSETUP_PATH="/opt/pysetup" \
     VENV_PATH="/opt/pysetup/.venv"
 
-
 # adiciona o poetry e o ambiente virtual ao PATH
 ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
+# instala dependências básicas e remove cache APT
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
-        # dependências necessárias para instalar o poetry
         curl \
-        # dependências para compilar pacotes Python nativos
-        build-essential
+        build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 # instala o poetry — respeita as variáveis $POETRY_VERSION e $POETRY_HOME
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
+# instala dependências adicionais e limpa cache APT após instalação
 RUN apt-get update \
     && apt-get -y install libpq-dev gcc \
-    # instala o driver psycopg2 (PostgreSQL) via pip
-    && pip install psycopg2
+    # instala o driver psycopg2 (PostgreSQL) via pip sem cache
+    && pip install --no-cache-dir psycopg2 \
+    && rm -rf /var/lib/apt/lists/*
 
 # copia os arquivos de dependências do projeto para garantir cache nas builds
 WORKDIR $PYSETUP_PATH
