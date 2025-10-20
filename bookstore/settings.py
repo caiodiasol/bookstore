@@ -25,9 +25,6 @@ SECRET_KEY = 'django-insecure-hwvjmjn3p14cu++1oterbc0ek&h3nt5b(r0g_@i3-j1x9u8*5v
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'caiodiasol.pythonanywhere.com']
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -159,4 +156,6 @@ DEBUG = int(os.environ.get("DEBUG", default=0))
 
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
 # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+ALLOWED_HOSTS = os.environ.get(
+    "DJANGO_ALLOWED_HOSTS", "caiodiasol.pythonanywhere.com localhost 127.0.0.1"
+).split(" ")
