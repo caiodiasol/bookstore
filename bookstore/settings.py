@@ -156,3 +156,13 @@ REST_FRAMEWORK = {
     ],
 }
 
+# Environment-specific settings
+SECRET_KEY = os.environ.get("SECRET_KEY", SECRET_KEY)
+DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
+
+# Ensure ALLOWED_HOSTS is always a list
+if isinstance(ALLOWED_HOSTS, str):
+    ALLOWED_HOSTS = ALLOWED_HOSTS.split(" ")
+elif ALLOWED_HOSTS is None:
+    ALLOWED_HOSTS = ["caiodiasol.pythonanywhere.com", "localhost", "127.0.0.1"]
+
