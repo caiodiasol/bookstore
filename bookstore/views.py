@@ -1,30 +1,27 @@
-from django.http import JsonResponse
+from django.http import HttpResponse
+from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
-import json
+
+import git
 
 
 @csrf_exempt
-@require_http_methods(["POST"])
 def update(request):
-    """
-    Update server endpoint for webhook or deployment updates.
-    """
-    try:
-        # Parse JSON data if present
-        if request.content_type == 'application/json':
-            data = json.loads(request.body)
-        else:
-            data = request.POST
-        
-        # Basic response for update endpoint
-        return JsonResponse({
-            'status': 'success',
-            'message': 'Server update received',
-            'data': data
-        })
-    except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': str(e)
-        }, status=400)
+    if request.method == "POST":
+        '''
+        pass the path of the diectory where your project will be
+        stored on PythonAnywhere in the git.Repo() as parameter.
+        Here the name of my directory is "test.pythonanywhere.com"
+        '''
+        repo = git.Repo('/home/caiodiasol/bookstore')
+        origin = repo.remotes.origin
+
+        origin.pull()
+        return HttpResponse("Updated code on PythonAnywhere")
+    else:
+        return HttpResponse("Couldn't update the code on PythonAnywhere")
+
+
+def hello_world(request):
+  template = loader.get_template('hello_world.html')
+  return HttpResponse(template.render())
