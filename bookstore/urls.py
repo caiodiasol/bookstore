@@ -28,8 +28,8 @@ urlpatterns = [
     re_path("bookstore/(?P<version>(v1|v2))/", include("product.urls")),
     path("api-token-auth/", obtain_auth_token, name="api_token_auth"),
     path("update_server/", views.update, name="update"),
-    path("hello/", views.hello_world, name="hello_world"),
-    path('api/', include('api.urls')),
+    path("hello/", views.hello_world, name="hello"),
+    path("", views.hello_world, name="home"),  # Rota para a página inicial
 ]
 
 
