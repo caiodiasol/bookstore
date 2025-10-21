@@ -27,9 +27,7 @@ DEBUG = True
 
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
 # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
-ALLOWED_HOSTS = os.environ.get(
-    "DJANGO_ALLOWED_HOSTS", "caiodiasol.pythonanywhere.com localhost 127.0.0.1"
-).split(" ")
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'caiodiasol.pythonanywhere.com']
 
 # Application definition
 
@@ -123,11 +121,13 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
+
+USE_L10N = True
 
 USE_TZ = True
 
@@ -142,9 +142,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-INTERNAL_IPS = [
-    '127.0.0.1',
-]
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -156,13 +153,6 @@ REST_FRAMEWORK = {
     ],
 }
 
-# Environment-specific settings
-SECRET_KEY = os.environ.get("SECRET_KEY", SECRET_KEY)
-DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
-
-# Ensure ALLOWED_HOSTS is always a list
-if isinstance(ALLOWED_HOSTS, str):
-    ALLOWED_HOSTS = ALLOWED_HOSTS.split(" ")
-elif ALLOWED_HOSTS is None:
-    ALLOWED_HOSTS = ["caiodiasol.pythonanywhere.com", "localhost", "127.0.0.1"]
-
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
