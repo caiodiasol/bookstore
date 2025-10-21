@@ -38,6 +38,9 @@ RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         curl \
         build-essential \
+        \
+        # ✅ [ADICIONADO] Instala o Git — necessário para o GitPython funcionar
+        git \
     && rm -rf /var/lib/apt/lists/*
 
 # instala o poetry — respeita as variáveis $POETRY_VERSION e $POETRY_HOME
